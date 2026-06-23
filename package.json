@@ -1,0 +1,24 @@
+{
+  "name": "skycors",
+  "version": "2.2.1",
+  "type": "module",
+  "description": "skyroute66 CORS proxy server",
+  "main": "app.js",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "node": "^26.3.1",
+    "wrangler": "^4.103.0"
+  },
+  "scripts": {
+    "dev": "NODE_ENV=development node skycors.js",
+    "devpm2": "NODE_ENV=development pm2 start skycors.js && pm2 monit",
+    "start": "node skycors.js",
+    "startpm2": "pm2 start skycors.js && pm2 monit",
+    "killpm2": "pm2 delete skycors",
+    "wrangler-deploy": "node wrangler-deploy.js"
+  },
+  "author": "Harrison Kong",
+  "license": "ISC"
+}

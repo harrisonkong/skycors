@@ -1,0 +1,25 @@
+{
+    "name" : "skycors",
+    "main" : "skycors.js",
+    "compatibility_date" : "2026-06-01",
+    "compatibility_flags" : [
+         "nodejs_compat",
+         "nodejs_compat_populate_process_env",
+         "enable_nodejs_http_server_modules"
+    ],
+    "observability": {
+        "enabled": false,
+        "head_sampling_rate": 1,
+        "logs": {
+            "enabled": true,
+            "head_sampling_rate": 1,
+            "persist": true,
+            "invocation_logs": true
+        },
+        "traces": {
+            "enabled": false,
+            "persist": true,
+            "head_sampling_rate": 1
+        }
+    }
+}

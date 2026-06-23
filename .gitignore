@@ -1,0 +1,6 @@
+node_modules
+**/.DS_Store
+skycors-log.txt
+.env
+private-doc
+.wrangler
