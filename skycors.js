@@ -8,6 +8,7 @@
 // 2021-02-27   1.00
 // 2021-02-28   1.10  - SSL and HTTPS only
 // 2026-06-22   2.2.2 - Modernized version
+// 2026-06-24   2.2.3 - Format date of logging entries
 // 
 // Usage
 // ======================================
@@ -132,9 +133,9 @@ async function getCloudflareEnv() {
 function getTimeStamp() {
 
     const rawStamp = Date.now()
-    const d = new Date(rawStamp)
-
-    return d.toISOString()
+    let formatted = (new Date(rawStamp)).toISOString().replace("T", " ")
+    formatted = formatted.slice(0, formatted.length - 5) + " UTC"
+    return formatted
 }
 
 function parsePayload(req_url) {
