@@ -9,6 +9,7 @@
 // 2021-02-28   1.10  - SSL and HTTPS only
 // 2026-06-22   2.2.2 - Modernized version
 // 2026-06-24   2.2.3 - Format date of logging entries
+// 2026-06-29   2.2.4 - Restrict undefined origins in production
 // 
 // Usage
 // ======================================
@@ -34,10 +35,10 @@ const config = await getConfiguration()
 
 // API Key is only used if origin is undefined
 // Listening port is not used for Cloudflare workers
-console.log(`API_KEY: ${config.API_KEY}`)
-if (!cloudflareEnv) {
-    console.log(`LISTENING_PORT: ${config.LISTENING_PORT}`)
-}
+// console.log(`API_KEY: ${config.API_KEY}`)
+// if (!cloudflareEnv) {
+//     console.log(`LISTENING_PORT: ${config.LISTENING_PORT}`)
+// }
 console.log(`LOGFILE: ${config.LOGFILE}`)
 // This can either be an array of origins (strings)
 // or a single string as "*" = allow all domains
@@ -49,23 +50,17 @@ const corsOptions = {
 
     let allowed = false
 
-    // allow requests with no origin (like mobile apps, curl, or same-origin requests)
-    if (!origin) {
-        allowed = true
-    }
-    else {
-        if (typeof config.ALLOWED_ORIGINS === 'string') {   // single string
-            if (config.ALLOWED_ORIGINS === "*") {   // is a wildcard
-                allowed = true
-            }
-            else {  // single string match
-                allowed = (config.ALLOWED_ORIGINS === origin)
-            }
-
-        }   // array of strings
-        else {  // if one of the strings matches
-            allowed = config.ALLOWED_ORIGINS.includes(origin)
+    if (typeof config.ALLOWED_ORIGINS === 'string') {   // single string
+        if (config.ALLOWED_ORIGINS === "*") {   // is a wildcard
+            allowed = true
         }
+        else {  // single string match
+            allowed = (config.ALLOWED_ORIGINS === origin)
+        }
+
+    }   // array of strings
+    else {  // if one of the strings matches
+        allowed = config.ALLOWED_ORIGINS.includes(origin)
     }
 
     // done with all tests, return the result
@@ -99,7 +94,6 @@ async function getConfiguration() {
     if (cloudflareEnv) {
         // Cloudflare worker
         return {
-            API_KEY:        cloudflareEnv.API_KEY,
             LOGFILE:        cloudflareEnv.LOGFILE,
             ALLOWED_ORIGINS: process.env.NODE_ENV === "development"? "*" : cloudflareEnv.ALLOWED_ORIGINS.split(",")
         }
@@ -108,7 +102,6 @@ async function getConfiguration() {
         // not Cloudflare worker
         await import('dotenv/config')
         return {
-            API_KEY:                    process.env.API_KEY,
             LISTENING_PORT:             process.env.PORT,
             LOGFILE:                    process.env.LOGFILE,
             ALLOWED_ORIGINS: process.env.NODE_ENV === "development"? "*" : process.env.ALLOWED_ORIGINS.split(","),
@@ -192,19 +185,6 @@ app.get('', async (req, res) => {
     }
 
     const targetUrl = new URL(urlAndParams)
-
-    // if origin is undefined, check API key
-    if (!req.headers.origin) {
-        const apiKey = targetUrl.searchParams.get('apikey')
-        if (!apiKey || apiKey !== config.API_KEY) {
-            console.log(`Invalid API key ${apiKey} rejected`)            
-            return res.status(401).json({ type: 'Error', message: 'A valid API key is required'})
-        }
-        else {  // get rid of the api key, not needed for target fetch
-            console.log(`Valid API key ${apiKey} accepted`)            
-            delete targetUrl.searchParams.delete('apikey')
-        }
-    }
 
     const response = await fetch(targetUrl)
   

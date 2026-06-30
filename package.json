@@ -1,6 +1,6 @@
 {
   "name": "skycors",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "type": "module",
   "description": "skyroute66 CORS proxy server",
   "main": "app.js",

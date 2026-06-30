@@ -7,7 +7,7 @@ A lightweight, **Node.js** CORS proxy server built to bypass Cross-Origin Resour
 - **CORS Header Injection:** Automatically sets `Access-Control-Allow-Origin` to incoming requests.
 - **Dynamic Routing:** Dynamically proxies requests to any target URL passed via query parameters.
 - **Lightweight:** Minimal dependencies ensuring fast execution and low memory overhead.
-- **Controlled Access** you can choose to allow all origins or a list of allowed origins. Requests with undefined origins are controlled by an **API key** to prevent abuse. (These usually do not need a CORS proxy server.)
+- **Controlled Access** you can choose to allow all origins or a list of allowed origins. Requests with undefined origins are only allowed in the development environment for testing. In production, these origins do not need a CORS proxy server.
 - **Versatile:** Can run locally for development or on cloud platform virtual machines (e.g. **AWS**) or as **Cloudflare** workers.
 
 ## 📦 Installation
@@ -40,9 +40,6 @@ Create a `.env` file in the root directory to configure your server port, allowe
 You can make a copy of `.env.sample` and modify it with your paramters. Follow the instructions in the comments.
 
 ```env
-# API key is only used when the origin is undefined (e.g. mobile apps, browser address bar, etc.)
-API_KEY="your_long_long_string_here"
-
 # These are ignored when running as a Cloudflare worker
 PORT=500
 SSL_CERT_LOCATION="/your-path-to/cert.pem"
@@ -119,18 +116,15 @@ Using a local non-Miniflare development environment `https://localhost:500` as e
 #### Try It with a Weather Site
 Type this in a web browser address bar:
 
-`https://localhost:500?target=https://www.7timer.info/bin/api.pl?lon=-118.243&lat=34.052&product=civil&output=json&apikey=the_key_in_your_env_file`
-
-The **API key** is only used when origin is undefined. **Examples**: browser address bar entries, mobile apps, curl.
+`https://localhost:500?target=https://www.7timer.info/bin/api.pl?lon=-118.243&lat=34.052&product=civil&output=json`
 
 #### Test Drive: Example Fetch Request with code:
 
-This is in ``test-drive.js``, be sure to change the port number and add your API key. (Since we are running this outside of a web brower, it won't have an origin. So the **API key** is required.
+This is in ``test-drive.js``, be sure to change the port number to the one you are using.
 
 ```javascript
 const proxyUrl  = 'https://localhost:500/'
 const targetUrl = 'https://www.7timer.info/bin/api.pl?lon=-118.243&lat=34.052&product=civil&output=json'
-const apikey    = 'your_api_key_here'
 
 const full_URL = proxyUrl + '?target=' + targetUrl + '&apikey=' + apikey
 console.log(full_URL)
@@ -158,6 +152,8 @@ If you put this code in the code for a webpage, you will not need the API key as
 | Version | Date | Description | Author |
 | :--- | :--- | :--- | :--- |
 | v2.2.2 | 2026-06-22 | Initial release                                         | @harrisonkong |
+| v2.2.3 | 2026-06-24 | Better format for the date time stamp in log entries    | @harrisonkong |
+| v2.2.4 | 2026-06-29 | Restrict 'undefined' origins in production              | @harrisonkong |
 
 
 ## 🛑 Pull Requests & Issues
