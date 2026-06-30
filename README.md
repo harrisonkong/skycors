@@ -39,19 +39,32 @@ Create a `.env` file in the root directory to configure your server port, allowe
 
 You can make a copy of `.env.sample` and modify it with your paramters. Follow the instructions in the comments.
 
+Here's an example:
+
 ```env
-# These are ignored when running as a Cloudflare worker
+# -------- NON-CLOUDFLARE VARIABLES STARTS HERE -------- #
+
+# All the variables in this sections are not used by Cloudflare workers
+
 PORT=500
 SSL_CERT_LOCATION="/your-path-to/cert.pem"
 SSL_PUBLIC_KEY_LOCATION="/your-path-to/cert-key.pem"
 
-# Not significant when running as a Cloudflare worker
+# Omit (commented out) = no logging
 LOGFILE="./skycors-log.txt"
+
+# -------- INCLUSION FOR CLOUDFLARE STARTS HERE -------- #
+
+# All the variables after this point will be used for 
+# ** BOTH ** Cloudflare workers ** AND ** non-Cloudflare workers
+
+# Do not modify or remove the marker line above!
 
 # an * indicates all origins are allowed (wildcard)
 # separate multiple origins with commas
 # This is ignored for local development environment, it will be assumed to be *
 ALLOWED_ORIGINS="https://sample.com,https://www.sample.com"
+
 ```
 
 ## 🚀 Usage
@@ -154,6 +167,7 @@ If you put this code in the code for a webpage, you will not need the API key as
 | v2.2.2 | 2026-06-22 | Initial release                                         | @harrisonkong |
 | v2.2.3 | 2026-06-24 | Better format for the date time stamp in log entries    | @harrisonkong |
 | v2.2.4 | 2026-06-29 | Restrict 'undefined' origins in production              | @harrisonkong |
+| v2.2.5 | 2026-06-30 | Avoid exposing local parameters to production           | @harrisonkong |
 
 
 ## 🛑 Pull Requests & Issues

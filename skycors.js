@@ -10,6 +10,7 @@
 // 2026-06-22   2.2.2 - Modernized version
 // 2026-06-24   2.2.3 - Format date of logging entries
 // 2026-06-29   2.2.4 - Restrict undefined origins in production
+// 2026-06-30   2.2.5 - Avoid exposing local parameters to production
 // 
 // Usage
 // ======================================
@@ -33,13 +34,10 @@ console.log(`Environment: ${process.env.NODE_ENV === "development" ? "developmen
 
 const config = await getConfiguration()
 
-// API Key is only used if origin is undefined
-// Listening port is not used for Cloudflare workers
-// console.log(`API_KEY: ${config.API_KEY}`)
-// if (!cloudflareEnv) {
-//     console.log(`LISTENING_PORT: ${config.LISTENING_PORT}`)
-// }
-console.log(`LOGFILE: ${config.LOGFILE}`)
+if (!cloudflareEnv) {
+    console.log(`LOGFILE: ${config.LOGFILE}`)
+    console.log(`LISTENING_PORT: ${config.LISTENING_PORT}`)
+}
 // This can either be an array of origins (strings)
 // or a single string as "*" = allow all domains
 console.log("ALLOWED_ORIGINS:")
@@ -77,7 +75,7 @@ const corsOptions = {
 }
 
 function appendToLog(logEntry) {
-    if (!cloudflareEnv) {
+    if (!cloudflareEnv && config.LOGFILE) {
         fs.appendFile(config.LOGFILE, logEntry + "\n", function (err) {
             if (err) {
             console.log("WARNING: appendToLog failed: " + err)
