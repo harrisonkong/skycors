@@ -11,6 +11,7 @@
 // 2026-06-24   2.2.3 - Format date of logging entries
 // 2026-06-29   2.2.4 - Restrict undefined origins in production
 // 2026-06-30   2.2.5 - Avoid exposing local parameters to production
+// 2026-10-15   2.2.6 - Allow exposing Access-Control-Allow-Origin header to client
 // 
 // Usage
 // ======================================
@@ -40,10 +41,10 @@ if (!cloudflareEnv) {
 }
 // This can either be an array of origins (strings)
 // or a single string as "*" = allow all domains
-console.log("ALLOWED_ORIGINS:")
-console.log(config.ALLOWED_ORIGINS)
+console.log(`ALLOWED_ORIGINS: ${config.ALLOWED_ORIGINS}`)
+console.log(`EXPOSE_ALLOW_ORIGIN_IN_RESPONSE: ${config.EXPOSE_ALLOW_ORIGIN_IN_RESPONSE}`)
 
-const corsOptions = {
+let corsOptions = {
   origin: (origin, callback) => {
 
     let allowed = false
@@ -74,6 +75,11 @@ const corsOptions = {
   }
 }
 
+// HK 10/15/2026
+if (config.EXPOSE_ALLOW_ORIGIN_IN_RESPONSE) {
+    corsOptions = {...corsOptions, exposedHeaders: ['Access-Control-Allow-Origin']}
+}
+
 function appendToLog(logEntry) {
     if (!cloudflareEnv && config.LOGFILE) {
         fs.appendFile(config.LOGFILE, logEntry + "\n", function (err) {
@@ -91,18 +97,22 @@ async function getConfiguration() {
 
     if (cloudflareEnv) {
         // Cloudflare worker
+        // HK 10/15/2026 - added EXPOSE_ALLOWED_ORIGIN_IN_RESPONSE in return
         return {
             LOGFILE:        cloudflareEnv.LOGFILE,
-            ALLOWED_ORIGINS: process.env.NODE_ENV === "development"? "*" : cloudflareEnv.ALLOWED_ORIGINS.split(",")
+            ALLOWED_ORIGINS: process.env.NODE_ENV === "development"? "*" : cloudflareEnv.ALLOWED_ORIGINS.split(","),
+            EXPOSE_ALLOW_ORIGIN_IN_RESPONSE: cloudflareEnv.EXPOSE_ALLOW_ORIGIN_IN_RESPONSE == "true",
         }
     }
     else {
         // not Cloudflare worker
         await import('dotenv/config')
+        // HK 10/15/2026 - added EXPOSE_ALLOWED_ORIGIN_IN_RESPONSE in return
         return {
             LISTENING_PORT:             process.env.PORT,
             LOGFILE:                    process.env.LOGFILE,
             ALLOWED_ORIGINS: process.env.NODE_ENV === "development"? "*" : process.env.ALLOWED_ORIGINS.split(","),
+            EXPOSE_ALLOW_ORIGIN_IN_RESPONSE: process.env.EXPOSE_ALLOW_ORIGIN_IN_RESPONSE == "true",
             SSL_PUBLIC_KEY_LOCATION:    process.env.SSL_PUBLIC_KEY_LOCATION,
             SSL_CERT_LOCATION:          process.env.SSL_CERT_LOCATION,
         }        
@@ -170,7 +180,7 @@ app.get('', async (req, res) => {
 
     let ip = req.connection.remoteAddress
     if (ip.startsWith('::ffff:')) {     // convert to IPv4 address
-        ip = ip.replace('::ffff:', '');
+        ip = ip.replace('::ffff:', '')
     }
 
     const logString = getTimeStamp() + " " + req.get('origin') + " " + ip + " " + urlAndParams
@@ -198,7 +208,7 @@ app.get('', async (req, res) => {
 let exportHandler   // we need this because we cannot export inside an if else block
 
 if (!cloudflareEnv) {
-    const https = await import('node:https');
+    const https = await import('node:https')
     https
         .createServer(
             {
@@ -218,8 +228,8 @@ else {
     app.listen(500)                                       // this port is only used by httpServerHandler
     exportHandler = httpServerHandler( { port: 500 } )    // this port is NOT what we are listening to
     // This port number is ignored in the production environment on Cloudflare
-    // when in wranger dev we are listening to 8787
-    // when in wranger deploy we are listening to 443 (no need to specify this port in URL)
+    // when in wrangler dev we are listening to 8787
+    // when in wrangler deploy we are listening to 443 (no need to specify this port in URL)
     console.log(`skyCORS Proxy Server started listening for HTTPS traffic.`)
 }
 

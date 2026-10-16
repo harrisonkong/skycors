@@ -1,6 +1,6 @@
 {
   "name": "skycors",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "type": "module",
   "description": "skyroute66 CORS proxy server",
   "main": "app.js",
@@ -19,6 +19,4 @@
     "killpm2": "pm2 delete skycors",
     "wrangler-deploy": "node wrangler-deploy.js"
   },
-  "author": "Harrison Kong",
-  "license": "ISC"
-}
+  "author": "Harrison Kong", "license": "ISC" }

@@ -65,6 +65,9 @@ LOGFILE="./skycors-log.txt"
 # This is ignored for local development environment, it will be assumed to be *
 ALLOWED_ORIGINS="https://sample.com,https://www.sample.com"
 
+# -------- COMMON INCLUSIONS FOR ALL PLATFORM STARTS HERE --------- #
+
+EXPOSE_ALLOWED_ORIGIN_IN_RESPONSE="true"
 ```
 
 ## 🚀 Usage
@@ -168,6 +171,8 @@ If you put this code in the code for a webpage, you will not need the API key as
 | v2.2.3 | 2026-06-24 | Better format for the date time stamp in log entries    | @harrisonkong |
 | v2.2.4 | 2026-06-29 | Restrict 'undefined' origins in production              | @harrisonkong |
 | v2.2.5 | 2026-06-30 | Avoid exposing local parameters to production           | @harrisonkong |
+| v2.2.6 | 2026-10-15 | Allow exposing Access-Control-Allow-Origin header       | @harrisonkong |
+|        |            | Correct typos                                           |               |
 
 
 ## 🛑 Pull Requests & Issues
