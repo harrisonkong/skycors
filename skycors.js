@@ -12,6 +12,7 @@
 // 2026-06-29   2.2.4 - Restrict undefined origins in production
 // 2026-06-30   2.2.5 - Avoid exposing local parameters to production
 // 2026-10-15   2.2.6 - Allow exposing Access-Control-Allow-Origin header to client
+// 2026-10/16   2.2.7 - Add wrangler local production mode
 // 
 // Usage
 // ======================================

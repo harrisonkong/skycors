@@ -41,7 +41,7 @@ You can make a copy of `.env.sample` and modify it with your paramters. Follow t
 
 Here's an example:
 
-```env
+```bash
 # -------- NON-CLOUDFLARE VARIABLES STARTS HERE -------- #
 
 # All the variables in this sections are not used by Cloudflare workers
@@ -65,7 +65,7 @@ LOGFILE="./skycors-log.txt"
 # This is ignored for local development environment, it will be assumed to be *
 ALLOWED_ORIGINS="https://sample.com,https://www.sample.com"
 
-# -------- COMMON INCLUSIONS FOR ALL PLATFORM STARTS HERE --------- #
+# -------- COMMON INCLUSION FOR ALL PLATFORMS STARTS HERE --------- #
 
 EXPOSE_ALLOWED_ORIGIN_IN_RESPONSE="true"
 ```
@@ -92,8 +92,11 @@ npm run devpm2
 # To stop pm2 instance
 npm run killpm2
 
-# To start MiniCloud instance
+# To start Miniflare development instance
 wrangler dev
+
+# To start Miniflare production instance
+npm run wrangler-production
 
 # To deploy to Cloudflare
 npm run wrangler-deploy
@@ -101,17 +104,17 @@ npm run wrangler-deploy
 
 ### Use the Server
 
-##### Development Environments, not Cloudflare
+#### Development Environments, not Cloudflare
 The server will be running at `https://localhost:[port you specified in .env]`.
 
-##### Development Environments, Miniflare
+#### Development AND Production Environments, Miniflare
 The server will be running at `https://localhost:8787`.
 
-##### Production Environments, virtual machines
-The server will be running at `https://[your_host_name]:[port you specified in .env`.
+#### Production Environments, virtual machines
+The server will be running at `https://[your_host_name]:[port you specified in .env]`.
 
-##### Production Environments, Cloudflare
-The server will be running at `https://[assigned_or_custom_subdomain_name`.
+#### Production Environments, Cloudflare
+The server will be running at `https://[assigned_or_custom_subdomain_name]`.
 It is actually listening to port 443 but it is the default port so you do not need to specify it.
 
 ### How to Make Requests
@@ -173,6 +176,7 @@ If you put this code in the code for a webpage, you will not need the API key as
 | v2.2.5 | 2026-06-30 | Avoid exposing local parameters to production           | @harrisonkong |
 | v2.2.6 | 2026-10-15 | Allow exposing Access-Control-Allow-Origin header       | @harrisonkong |
 |        |            | Correct typos                                           |               |
+| v2.2.7 | 2026-10-16 | Add wrangler local production mode                      | @harrisonkong |
 
 
 ## 🛑 Pull Requests & Issues
