@@ -12,7 +12,12 @@
 // 2026-06-29   2.2.4 - Restrict undefined origins in production
 // 2026-06-30   2.2.5 - Avoid exposing local parameters to production
 // 2026-10-15   2.2.6 - Allow exposing Access-Control-Allow-Origin header to client
-// 2026-10/16   2.2.7 - Add wrangler local production mode
+// 2026-10-16   2.2.7 - Add wrangler local production mode
+// 2026-10-21   2.3.0 - Improve wording and more detail for CORS error messages
+//                    - Decode outbound URI
+//                    - Cloudflare compatibility date changed to 2026-08-04 from 2026-06-01
+//                    - Set outboundUserAgent in headers and include origin if provided
+//                    - Show version number at startup
 // 
 // Usage
 // ======================================
@@ -22,6 +27,10 @@
 import fs from 'node:fs'
 import express from 'express'
 import cors from 'cors'
+import packageInfo from "./package.json" with { type: "json" }  // HK 10/21/2026
+
+// HK 10/21/2016
+console.log("skyCORS version:", packageInfo.version)
 
 const cloudflareEnv = await getCloudflareEnv()
 
@@ -69,7 +78,8 @@ let corsOptions = {
         return callback(null, true)
     }
     else {
-        const msg = 'The CORS policy for this site blocks access from the origin ' + origin
+        // HK 10/21/2026 - better wording
+        const msg = 'The CORS policy for this skyCORS instance blocks access from the origin ' + origin
         console.log(`Unauthorized origin ${origin} blocked by CORS policy`)
         return callback(msg, false)        
     }
@@ -144,7 +154,9 @@ function parsePayload(req_url) {
 
     // We need to get rid of the /?target= part, leaving us with the target url and parameters
 
-    var payload = req_url.substr(9, req_url.length - 9)
+    // HK 10/21/2026
+    // var payload = req_url.substr(9, req_url.length - 9)
+    var payload = decodeURIComponent(req_url.substr(9, req_url.length - 9))
 
     // We also need to substitute the first & for the remainder as a ?
     // because the /?target= part took the first ? and the rest of the url if the whole string
@@ -195,10 +207,34 @@ app.get('', async (req, res) => {
 
     const targetUrl = new URL(urlAndParams)
 
-    const response = await fetch(targetUrl)
+
+    // HK 10/21/2026
+    const origin = req.get("origin")
+    const version = packageInfo.version
+
+    let outboundUserAgent = "skyCORS/" + version
+
+    if (origin) {
+        outboundUserAgent += " (" + origin + ")"
+    }
+
+    // HK 10/21/2026 - changed this line to include headers
+    // const response = await fetch(targetUrl)
+    const response = await fetch(targetUrl, {
+        headers: {
+            "User-Agent": outboundUserAgent
+        }
+    })
   
     if (!response.ok) {
-        return res.status(500).json({ type: 'Error', message: 'Failed to fetch the target URL: ' + urlAndParams })
+        // HK 10/21/2026 - More detailed
+        return res.status(500).json({
+            type: 'UpstreamError',
+            skyCORSMessage: 'skyCORS received an error from the target',
+            target: urlAndParams,
+            upStreamStatusCode: res.statusCode,
+            upStreamStatusText: res.statusText,
+        })
     } else {
         const body = await response.text()
         res.send(body)

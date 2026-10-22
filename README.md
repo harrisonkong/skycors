@@ -10,6 +10,29 @@ A lightweight, **Node.js** CORS proxy server built to bypass Cross-Origin Resour
 - **Controlled Access** you can choose to allow all origins or a list of allowed origins. Requests with undefined origins are only allowed in the development environment for testing. In production, these origins do not need a CORS proxy server.
 - **Versatile:** Can run locally for development or on cloud platform virtual machines (e.g. **AWS**) or as **Cloudflare** workers.
 
+## 🚀 Try It!
+
+You can test drive this server right on a web page at [https://skyroute66.com/portfolio/skycors.html](https://skyroute66.com/portfolio/skycors.html)
+
+
+## 🗓️ Version History
+
+| Version | Date | Description | Author |
+| :--- | :--- | :--- | :--- |
+| v2.2.2 | 2026-06-22 | Initial release                                         | @harrisonkong |
+| v2.2.3 | 2026-06-24 | Better format for the date time stamp in log entries    | @harrisonkong |
+| v2.2.4 | 2026-06-29 | Restrict 'undefined' origins in production              | @harrisonkong |
+| v2.2.5 | 2026-06-30 | Avoid exposing local parameters to production           | @harrisonkong |
+| v2.2.6 | 2026-10-15 | Allow exposing Access-Control-Allow-Origin header       | @harrisonkong |
+|        |            | Correct typos                                           ||
+| v2.2.7 | 2026-10-16 | Add wrangler local production mode                      | @harrisonkong |
+| v2.3.0 | 2026-10-21 | Improve wording and more detail for CORS error messages | @harrisonkong |
+|        |            | Decode outbound URI                                     ||
+|        |            | Cloudflare compatibility date changed to 2026-08-04 from 2026-06-01 ||
+|        |            | Set outboundUserAgent in headers and include origin if provided     ||
+|        |            | Show version number at startup                          ||
+
+
 ## 📦 Installation
 
 Follow these steps to set up the proxy server locally on your machine.
@@ -165,18 +188,6 @@ You should see some json data returned.
 This script will actually run just fine without using the CORS proxy server because CORS is a browser only restriction. But it demostrates how to use the server.
 
 If you put this code in the code for a webpage, you will not need the API key as long as you specified `localhost` as your allowed origin.
-
-## 🗓️ Version History
-
-| Version | Date | Description | Author |
-| :--- | :--- | :--- | :--- |
-| v2.2.2 | 2026-06-22 | Initial release                                         | @harrisonkong |
-| v2.2.3 | 2026-06-24 | Better format for the date time stamp in log entries    | @harrisonkong |
-| v2.2.4 | 2026-06-29 | Restrict 'undefined' origins in production              | @harrisonkong |
-| v2.2.5 | 2026-06-30 | Avoid exposing local parameters to production           | @harrisonkong |
-| v2.2.6 | 2026-10-15 | Allow exposing Access-Control-Allow-Origin header       | @harrisonkong |
-|        |            | Correct typos                                           |               |
-| v2.2.7 | 2026-10-16 | Add wrangler local production mode                      | @harrisonkong |
 
 
 ## 🛑 Pull Requests & Issues
