@@ -31,6 +31,7 @@ You can test drive this server right on a web page at [https://skyroute66.com/po
 |        |            | Cloudflare compatibility date changed to 2026-08-04 from 2026-06-01 ||
 |        |            | Set outboundUserAgent in headers and include origin if provided     ||
 |        |            | Show version number at startup                          ||
+| v2.4.0 | 2026-10-28 | Forward authorization in inbound headers outbound       | @harrisonkong |
 
 
 ## 📦 Installation

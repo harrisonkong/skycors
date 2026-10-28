@@ -18,7 +18,8 @@
 //                    - Cloudflare compatibility date changed to 2026-08-04 from 2026-06-01
 //                    - Set outboundUserAgent in headers and include origin if provided
 //                    - Show version number at startup
-// 
+// 2026-10-28   2.4.0 - Forward authorization in incoming headers outbound
+//
 // Usage
 // ======================================
 // https://server_URL:port?target=https://some-api-provider-site.com?param1=abc&param2=12345
@@ -218,12 +219,25 @@ app.get('', async (req, res) => {
         outboundUserAgent += " (" + origin + ")"
     }
 
+    // HK 10/28/2026
+    var outboundHeaders = {
+        "User-Agent": outboundUserAgent
+    }
+
+    var authorization = req.get("authorization")
+
+    if (authorization) {
+        outboundHeaders["Authorization"] = authorization
+    }
+
     // HK 10/21/2026 - changed this line to include headers
     // const response = await fetch(targetUrl)
     const response = await fetch(targetUrl, {
-        headers: {
-            "User-Agent": outboundUserAgent
-        }
+        // HK 10/28/2026
+        headers: outboundHeaders
+        // headers: {
+        //     "User-Agent": outboundUserAgent
+        // }
     })
   
     if (!response.ok) {
