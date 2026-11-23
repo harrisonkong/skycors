@@ -32,7 +32,8 @@ You can test drive this server right on a web page at [https://skyroute66.com/po
 |        |            | Set outboundUserAgent in headers and include origin if provided     ||
 |        |            | Show version number at startup                          ||
 | v2.4.0 | 2026-10-28 | Forward authorization in inbound headers outbound       | @harrisonkong |
-
+| v2.4.1 | 2026-11-23 | Update deprecated res.connection to res.socket          | @harrisonkong |
+|        |            | Improve upstream error handling to prevent undici processTicksAndRejection ||
 
 ## 📦 Installation
 

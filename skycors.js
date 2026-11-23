@@ -19,6 +19,8 @@
 //                    - Set outboundUserAgent in headers and include origin if provided
 //                    - Show version number at startup
 // 2026-10-28   2.4.0 - Forward authorization in incoming headers outbound
+// 2026-11-23   2.4.1 - Update deprecated res.connection to res.socket
+//                    - Improve upstream error handling to prevent undici processTicksAndRejection
 //
 // Usage
 // ======================================
@@ -192,7 +194,8 @@ app.get('', async (req, res) => {
 
     const urlAndParams = parsePayload(req.url)
 
-    let ip = req.connection.remoteAddress
+    // HK 11/23/2026 let ip = req.connection.remoteAddress
+    let ip = req.socket.remoteAddress
     if (ip.startsWith('::ffff:')) {     // convert to IPv4 address
         ip = ip.replace('::ffff:', '')
     }
@@ -230,29 +233,50 @@ app.get('', async (req, res) => {
         outboundHeaders["Authorization"] = authorization
     }
 
-    // HK 10/21/2026 - changed this line to include headers
-    // const response = await fetch(targetUrl)
-    const response = await fetch(targetUrl, {
-        // HK 10/28/2026
-        headers: outboundHeaders
-        // headers: {
-        //     "User-Agent": outboundUserAgent
-        // }
-    })
-  
-    if (!response.ok) {
-        // HK 10/21/2026 - More detailed
-        return res.status(500).json({
-            type: 'UpstreamError',
-            skyCORSMessage: 'skyCORS received an error from the target',
-            target: urlAndParams,
-            upStreamStatusCode: res.statusCode,
-            upStreamStatusText: res.statusText,
+    // HK 11/23/2026 - try catch blocks
+    try {
+        // HK 10/21/2026 - changed this line to include headers
+        // const response = await fetch(targetUrl)
+        const response = await fetch(targetUrl, {
+            // HK 10/28/2026
+            headers: outboundHeaders
+            // headers: {
+            //     "User-Agent": outboundUserAgent
+            // }
         })
-    } else {
-        const body = await response.text()
-        res.send(body)
-    }   
+    
+        if (!response.ok) {
+
+            // HK 10/21/2026
+            console.error("skyCORS upstream HTTP error:",
+                response.status,
+                response.statusText,
+                urlAndParams
+            )
+            // HK 10/21/2026 - More detailed
+            // HK 11/23/2026
+            return res.status(502).json({
+                type: 'UpstreamError',
+                skyCORSMessage: 'skyCORS received an error from the target',
+                target: urlAndParams,
+                upStreamStatusCode: response.status,
+                upStreamStatusText: response.statusText,
+            })
+        } else {
+            const body = await response.text()
+            res.send(body)
+        }
+    }
+    catch(error) {
+        console.error("skyCORS outbound request failed:", error.message)
+        console.error("Underlying cause:", error.cause || error)
+
+        return res.status(502).json({
+            type: 'NetworkError',
+            skyCORSMessage: 'skyCORS failed to communicate with the target',
+            target: urlAndParams
+        })
+    }
 
 })
 
